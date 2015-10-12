@@ -1,0 +1,14 @@
+
+.vs/
+Debug/
+Release/
+ipch/
+x64/
+
+*.exe
+*.opensdf
+*.sdf
+*.suo
+*.vcxproj.user
+*.zip
+
