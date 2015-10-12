@@ -26,3 +26,7 @@
 *.exe
 *.out
 *.app
+
+.lock-waf*
+build/
+waf3-*
