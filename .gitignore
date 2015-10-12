@@ -1,14 +1,28 @@
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
 
-.vs/
-Debug/
-Release/
-ipch/
-x64/
+# Precompiled Headers
+*.gch
+*.pch
 
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
 *.exe
-*.opensdf
-*.sdf
-*.suo
-*.vcxproj.user
-*.zip
-
+*.out
+*.app
