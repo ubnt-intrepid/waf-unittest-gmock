@@ -10,8 +10,7 @@ from os import path
 from pprint import pprint, pformat
 from xml.etree import ElementTree
 from waflib.TaskGen import feature, before_method, after_method, taskgen_method
-from waflib import Options, Logs, Errors
-from waflib import Utils, Task, Logs, Options
+from waflib import Options, Logs, Errors, Utils, Task
 
 testlock = Utils.threading.Lock()
 
