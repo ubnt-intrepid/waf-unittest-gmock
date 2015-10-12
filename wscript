@@ -30,3 +30,8 @@ def build(bld):
         target = 'test_gtest',
         source = 'test_gtest.cc')
 
+    bld(features='cxx cxxprogram test',
+        target = 'test_gmock',
+        source = 'test_gmock.cc',
+    )
+
