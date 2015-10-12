@@ -5,6 +5,10 @@
 # * デフォルトでのテストの実行を抑制する
 
 import os
+import re
+from os import path
+from pprint import pprint, pformat
+from xml.etree import ElementTree
 from waflib.TaskGen import feature, before_method, after_method, taskgen_method
 from waflib import Options, Logs, Errors
 from waflib import Utils, Task, Logs, Options
@@ -26,7 +30,6 @@ def make_test(self):
     if getattr(self, 'link_task', None):
         self.create_task('utest', self.link_task.outputs)
 
-
 @taskgen_method
 def add_test_results(self, tup):
     """
@@ -39,9 +42,6 @@ def add_test_results(self, tup):
         self.bld.utest_results.append(tup)
     except AttributeError:
         self.bld.utest_results = [tup]
-
-from xml.etree import ElementTree
-
 
 class utest(Task.Task):
     """
@@ -104,8 +104,6 @@ class utest(Task.Task):
 
         Override ``add_test_results`` to interrupt the build
         """
-
-        from os import path
         filename = self.inputs[0].abspath()
         output_filename = path.splitext(filename)[0]+'_result.xml'
 
@@ -134,6 +132,35 @@ class utest(Task.Task):
         finally:
             testlock.release()
 
+def summary(bld):
+    """
+    Show the status of Google Test
+    """
+    lst = getattr(bld, 'utest_results', [])
+    if not lst:
+        return
+
+    Logs.pprint('CYAN', '[test summary]')
+
+    nfails = 0
+
+    for (f, code, out, err, result) in lst:
+        fail = int(result.attrib['failures'])
+        if fail > 0:
+            nfails += fail
+            for failure in result.iter('failure'):
+                message = failure.attrib['message']
+                message_body = '\n'.join(message.split('\n')[1:])
+                message = message.split('\n')[0]
+
+                m = re.compile(r'^(.*):([0-9]+)$').match(message)
+                body = m.group(1)
+                num = int(m.group(2))
+                Logs.error('{}({}): error: {}'.format(body, num, message_body))
+
+    if nfails > 0:
+        raise Errors.WafError('test failed')
+
 def set_exit_code(bld):
     """
     If any of the tests fail waf will exit with that exit code.
@@ -147,7 +174,7 @@ def set_exit_code(bld):
             bld.add_post_fun(waf_unit_test.set_exit_code)
     """
     lst = getattr(bld, 'utest_results', [])
-    for (f, code, out, err) in lst:
+    for (f, code, out, err, result) in lst:
         if code:
             msg = []
             if out:
@@ -155,6 +182,7 @@ def set_exit_code(bld):
             if err:
                 msg.append('stderr:%s%s' % (os.linesep, err.decode('utf-8')))
             bld.fatal(os.linesep.join(msg))
+
 
 def options(opt):
     opt.add_option('--notests',  action='store_true', default=False,
@@ -190,65 +218,3 @@ def build(bld):
     )
 
     bld.add_post_fun(summary)
-
-def summary(bld):
-    """
-    Show the status of Google Test
-    """
-
-    from pprint import pprint, pformat
-
-    lst = getattr(bld, 'utest_results', [])
-    if not lst:
-        return
-
-    Logs.pprint('CYAN', '[test summary]')
-
-    nfails = 0
-
-    for (f, code, out, err, result) in lst:
-        fail = int(result.attrib['failures'])
-        if fail > 0:
-            # Logs.pprint('RED',   pformat(result.attrib))
-            nfails += fail
-            for failure in result.iter('failure'):
-                message = failure.attrib['message']
-                message_body = '\n'.join(message.split('\n')[1:])
-                message = message.split('\n')[0]
-
-                import re
-                m = re.compile(r'^(.*):([0-9]+)$').match(message)
-                body = m.group(1)
-                num = int(m.group(2))
-                Logs.error('{}({}): error: {}'.format(body, num, message_body))
-
-    if nfails > 0:
-        raise Errors.WafError('test failed')
-
-
-# original summary function
-# def summary(bld):
-#     """
-#     Display an execution summary::
-#
-#         def build(bld):
-#             bld(features='cxx cxxprogram test', source='main.c', target='app')
-#             from waflib.Tools import waf_unit_test
-#             bld.add_post_fun(waf_unit_test.summary)
-#     """
-#     lst = getattr(bld, 'utest_results', [])
-#     if lst:
-#         Logs.pprint('CYAN', 'execution summary')
-#
-#         total = len(lst)
-#         tfail = len([x for x in lst if x[1]])
-#
-#         Logs.pprint('CYAN', '  tests that pass %d/%d' % (total-tfail, total))
-#         for (f, code, out, err) in lst:
-#             if not code:
-#                 Logs.pprint('CYAN', '    %s' % f)
-#
-#         Logs.pprint('CYAN', '  tests that fail %d/%d' % (tfail, total))
-#         for (f, code, out, err) in lst:
-#             if code:
-#                 Logs.pprint('CYAN', '    %s' % f)
