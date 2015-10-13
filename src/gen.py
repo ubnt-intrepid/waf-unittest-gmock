@@ -16,25 +16,25 @@ tgend   = '\n#<==\n'.encode()
 import io
 
 def to_tbz2(src):
-    TBZ_NAME = 'fused_gmock.tar.bz2'
-    with tarfile.open(TBZ_NAME, 'w:bz2') as t:
+    """指定ディレクトリを圧縮したバイナリを取得する"""
+    f = io.BytesIO() 
+    with tarfile.open(fileobj=f, mode='w:bz2') as t:
         for root, dirs, files in os.walk(src):
             for _file in files:
                 _file = os.path.join(root, _file)
                 aname = os.path.relpath(_file, src)
                 t.add(_file, arcname=aname)
-    with open(TBZ_NAME, 'rb') as f: 
-        tbz = f.read()
-
-    os.remove(TBZ_NAME)
-    return tbz
+    return f.getvalue()
 
 def main():
-    tbz = to_tbz2(GMOCK_DIR)
-    
+    # read source files
     scr = open(TMPL_NAME, 'rb').read()
+    tbz = to_tbz2(GMOCK_DIR)
+   
+    # append archived gmock files with signatures
     scr += tgbegin + base64.b64encode(tbz) + tgend
 
+    # save
     with open(DEST_NAME, 'wb') as f:
         f.write(scr)
 
