@@ -20,7 +20,9 @@ def to_tbz2(src):
     with tarfile.open(TBZ_NAME, 'w:bz2') as t:
         for root, dirs, files in os.walk(src):
             for _file in files:
-                t.add(os.path.join(root, _file))
+                _file = os.path.join(root, _file)
+                aname = os.path.relpath(_file, src)
+                t.add(_file, arcname=aname)
     with open(TBZ_NAME, 'rb') as f: 
         tbz = f.read()
 
@@ -37,7 +39,4 @@ def main():
         f.write(scr)
 
 if __name__ == '__main__':
-    try:
-        main()
-    except:
-        print(sys.exc_info()[1])
+    main()
