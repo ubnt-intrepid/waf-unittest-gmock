@@ -8,23 +8,19 @@ import tarfile
 tgbegin = '\n#==>\n#'.encode()
 tgend   = '\n#<==\n'.encode()
 
-def main():
+def extract_this(dst):
     fname = __file__
     if fname.endswith('.pyc'):
         fname = fname[0:-1]
 
-    content = open(fname, 'rb').read()
-    s = content.find(tgbegin)
-    e = content.find(tgend)
-    body = content[0:s]
-    
-    tbz = content[s+len(tgbegin):e]
+    # decode zipped files
+    tbz = open(fname, 'rb').read()
+    tbz = tbz[tbz.find(tgbegin) + len(tgbegin) : tbz.find(tgend)]
     tbz = base64.b64decode(tbz)
-    tbz = io.BytesIO(tbz)
-    with tarfile.open(fileobj=tbz) as t:
-        t.extractall('tmp_')
-
-    'gmock-1.7.0/fused-src/'
+   
+    # extract
+    with tarfile.open(fileobj=io.BytesIO(tbz)) as t:
+        t.extractall(dst)
 
 if __name__ == '__main__':
-    main()
+    extract_this('tmp_')

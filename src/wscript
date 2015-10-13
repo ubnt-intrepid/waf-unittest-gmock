@@ -198,21 +198,16 @@ def configure(conf):
 
 def build(bld):
     bld(target = 'gmock',
-        features = 'cxx',  # entry pointを同梱させるための措置(cxxstlibにしない)
+        features = 'cxx',
         source = [
-            'gmock/src/gmock-all.cc',
-            'gtest/src/gtest-all.cc',
-            'gmock/src/gmock_main.cc',
+            'gmock-1.7.0/fused-src/gmock-gtest-all.cc',
+            'gmock-1.7.0/fused-src/gmock_main.cc',
         ],
         includes = [
-            'gmock',
-            'gmock/include',
-            'gtest',
-            'gtest/include',
+            'gmock-1.7.0/fused-src',
         ],
         export_includes = [
-            'gmock/include',
-            'gtest/include',
+            'gmock-1.7.0/fused-src',
         ],
     )
 
