@@ -1,2 +1,2 @@
-*.tar.bz2
+tmp_/
 waf_unittest_gmock.py
