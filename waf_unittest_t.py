@@ -75,7 +75,6 @@ def attach_gmock(self):
 
     self.includes = self.to_list(getattr(self, 'includes',[])) + [self.env.UNITTEST_GMOCK_PATH]
     self.use = self.to_list(getattr(self, 'use', [])) + ['GMOCK_OBJECTS']
-    self.bld.add_post_fun(summary)
 
 @feature('test')
 @after_method('apply_link')

@@ -21,6 +21,7 @@ def configure(conf):
         if compiler == 'clang++':
             conf.env.append_unique('CXXFLAGS', ['-stdlib=libc++'])
 
+
 def build(bld):
     bld(features='cxx cxxprogram test',
         target = 'test_gtest',
@@ -31,4 +32,7 @@ def build(bld):
         target = 'test_gmock',
         source = 'test_gmock.cc',
     )
+
+    import waf_unittest_gmock
+    bld.add_post_fun(waf_unittest_gmock.summary)
 
