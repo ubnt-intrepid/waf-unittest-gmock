@@ -5,7 +5,7 @@ using testing::AtLeast;
 
 class ITurtle {
 public:
-    virtual ~ITurtle() = default;
+    virtual ~ITurtle() {}
     virtual void PenDown() = 0;
 };
 
