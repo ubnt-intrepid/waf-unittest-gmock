@@ -30,3 +30,5 @@
 .lock-waf*
 build/
 waf3-*
+tmp_/
+waf_unittest_gmock.py
