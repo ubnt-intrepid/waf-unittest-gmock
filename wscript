@@ -5,7 +5,7 @@ TOP = '.'
 OUT = 'build'
 
 def options(opt):
-    opt.load('compiler_cxx waf_unittest_gmock')
+    opt.load('compiler_cxx waf_unittest_gmock msvs')
 
 def configure(conf):
     conf.load('compiler_cxx waf_unittest_gmock')
@@ -35,4 +35,3 @@ def build(bld):
 
     import waf_unittest_gmock
     bld.add_post_fun(waf_unittest_gmock.summary)
-

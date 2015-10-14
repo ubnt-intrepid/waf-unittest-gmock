@@ -174,19 +174,29 @@ class utest(Task.Task):
         if testcmd:
             self.ut_exec = (testcmd % self.ut_exec[0]).split(' ')
 
-        Logs.info(str(self.ut_exec))
+        # run test process.
         proc = Utils.subprocess.Popen(self.ut_exec, cwd=cwd, env=self.get_test_env(), stderr=Utils.subprocess.PIPE, stdout=Utils.subprocess.PIPE)
         (stdout, stderr) = proc.communicate()
+        test_outputs = ElementTree.parse(output_filename).getroot()
 
-        # read result from output_filename
-        test_results = ElementTree.parse(output_filename).getroot()
+        tup = GTestInfo(filename, proc.returncode, stdout, stderr, test_outputs)
 
-        tup = (filename, proc.returncode, stdout, stderr, test_results)
         testlock.acquire()
         try:
             return self.generator.add_test_results(tup)
         finally:
             testlock.release()
+
+class GTestInfo(object):
+    def __init__(self, filename, retcode, stdout, stderr, output):
+        self.filename = filename
+        self.retcode  = retcode
+        self.stdout   = stdout
+        self.stderr   = stderr
+        self.output   = output
+
+    def __str__(self):
+        return pformat(self.__dict__)
 
 def summary(bld):
     """
@@ -200,13 +210,15 @@ def summary(bld):
 
     nfails = 0
 
-    for (f, code, out, err, result) in lst:
+    for l in lst:
+        Logs.info(l)
+        (f, code, out, err, result) = (l.filename, l.retcode, l.stdout, l.stderr, l.output)
         fail = int(result.attrib['failures'])
         if fail > 0:
             nfails += fail
             for failure in result.iter('failure'):
                 message = failure.attrib['message']
-                message_body = '\n'.join(message.split('\n')[1:])
+                message_body = ' , '.join(message.split('\n')[1:])
                 message = message.split('\n')[0]
 
                 m = re.compile(r'^(.*):([0-9]+)$').match(message)
