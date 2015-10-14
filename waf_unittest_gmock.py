@@ -62,7 +62,7 @@ def configure(conf):
 @feature('test')
 @before_method('process_source')
 def attach_gmock(self):
-    if getattr(self.bld, 'has_gmock_objects', False):
+    if not getattr(self.bld, 'has_gmock_objects', False):
         self.bld(target = 'GMOCK_OBJECTS',
             features = 'cxx',
             source = [
