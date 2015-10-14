@@ -9,27 +9,21 @@ Yet another Waf unittest framework for GoogleTest/GoogleMock users
 
 ## Install in Your Project
 
-* プロジェクト内の適当なディレクトリに展開
-* 展開したディレクトリの `src` をWaf側で読み込む
+`waf_unittest_gmock.py`をプロジェクト直下にコピー
 
 ```python
-...
-
-GMOCK_DIR = ['waf-unittest-gmock/src']
-
 def options(opt):
-    opt.recurse(GMOCK_DIR)
+    opt.load('waf_unittest_gmock')
     ...
 
 def configure(conf):
-    conf.recurse(GMOCK_DIR)
+    conf.load('waf_unittest_gmock')
     ...
 
 def build(bld):
-    bld.recurse(GMOCK_DIR)
+    import waf_unittest_gmock
+    bld.add_post_fun(waf_unittest_gmock.summary)
     ...
-
-...
 ```
 
 ## Usage
