@@ -52,7 +52,6 @@ def options(opt):
 def configure(conf):
     try:
         extract_this(GMOCK_UNPACK_DIR)
-        conf.env.UNITTEST_GMOCK_PATH = path.abspath(GMOCK_UNPACK_DIR)
         conf.msg('Unpacking gmock', 'yes')
     except:
         conf.msg('Unpacking gmock', 'no')
@@ -63,17 +62,18 @@ def configure(conf):
 @before_method('process_source')
 def attach_gmock(self):
     if not getattr(self.bld, 'has_gmock_objects', False):
-        self.bld(target = 'GMOCK_OBJECTS',
+        self.bld(
+            target = 'GMOCK_OBJECTS',
             features = 'cxx',
             source = [
                 GMOCK_UNPACK_DIR + '/gmock-gtest-all.cc',
                 GMOCK_UNPACK_DIR + '/gmock_main.cc',
             ],
             includes = [GMOCK_UNPACK_DIR],
+            export_includes = [GMOCK_UNPACK_DIR],
         )
         self.bld.has_gmock_objects = True
 
-    self.includes = self.to_list(getattr(self, 'includes',[])) + [self.env.UNITTEST_GMOCK_PATH]
     self.use = self.to_list(getattr(self, 'use', [])) + ['GMOCK_OBJECTS']
 
 @feature('test')
