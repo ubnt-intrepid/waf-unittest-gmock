@@ -32,3 +32,5 @@ build/
 waf3-*
 tmp_/
 waf_unittest_gmock.py
+.waf_unittest_gmock
+__pycache__
