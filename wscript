@@ -5,12 +5,10 @@ TOP = '.'
 OUT = 'build'
 
 def options(opt):
-    opt.load('compiler_cxx')
-    opt.recurse('src')
+    opt.load('compiler_cxx waf_unittest_gmock')
 
 def configure(conf):
-    conf.load('compiler_cxx')
-    conf.recurse('src')
+    conf.load('compiler_cxx waf_unittest_gmock')
 
     cxx_name = conf.env.CXX_NAME
     if cxx_name == 'msvc':
@@ -23,9 +21,8 @@ def configure(conf):
         if compiler == 'clang++':
             conf.env.append_unique('CXXFLAGS', ['-stdlib=libc++'])
 
-def build(bld):
-    bld.recurse('src')
 
+def build(bld):
     bld(features='cxx cxxprogram test',
         target = 'test_gtest',
         source = 'test_gtest.cc',
@@ -35,4 +32,7 @@ def build(bld):
         target = 'test_gmock',
         source = 'test_gmock.cc',
     )
+
+    import waf_unittest_gmock
+    bld.add_post_fun(waf_unittest_gmock.summary)
 
